@@ -1,0 +1,91 @@
+name: Test Extension
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Validate manifest.json
+      run: |
+        if ! jq empty manifest.json 2>/dev/null; then
+          echo "manifest.json is not valid JSON"
+          exit 1
+        fi
+        echo "✅ manifest.json is valid"
+    
+    - name: Validate blocklists
+      run: |
+        if ! jq empty blocklists/domains.json 2>/dev/null; then
+          echo "domains.json is not valid JSON"
+          exit 1
+        fi
+        if ! jq empty blocklists/keywords.json 2>/dev/null; then
+          echo "keywords.json is not valid JSON"
+          exit 1
+        fi
+        echo "✅ Blocklists are valid"
+    
+    - name: Check file structure
+      run: |
+        required_files=(
+          "manifest.json"
+          "background.js"
+          "content.js"
+          "popup.html"
+          "popup.js"
+          "setup.html"
+          "setup.js"
+          "blocked.html"
+          "blocked.js"
+          "blocklists.html"
+          "blocklists.js"
+          "blocklists/domains.json"
+          "blocklists/keywords.json"
+          "README.md"
+          "LICENSE"
+        )
+        
+        for file in "${required_files[@]}"; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Missing required file: $file"
+            exit 1
+          fi
+        done
+        echo "✅ All required files present"
+    
+    - name: Check for syntax errors
+      run: |
+        # Check JavaScript files for basic syntax errors
+        for file in *.js blocklists.js; do
+          if [ -f "$file" ]; then
+            node -c "$file" || exit 1
+          fi
+        done
+        echo "✅ No JavaScript syntax errors"
+    
+    - name: Verify blocklist counts
+      run: |
+        domain_count=$(jq '.domains | length' blocklists/domains.json)
+        keyword_count=$(jq '.keywords | length' blocklists/keywords.json)
+        
+        echo "📊 Blocklist Statistics:"
+        echo "  Domains: $domain_count"
+        echo "  Keywords: $keyword_count"
+        
+        if [ "$domain_count" -lt 1000 ]; then
+          echo "⚠️ Warning: Domain count is less than expected"
+        fi
+        
+        if [ "$keyword_count" -lt 1000 ]; then
+          echo "⚠️ Warning: Keyword count is less than expected"
+        fi
+        
+        echo "✅ Blocklist verification complete"
