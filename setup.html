@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pure Path Setup</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 50px;
+      max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 32px;
+      text-align: center;
+    }
+    
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .section {
+      margin: 30px 0;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .info-box {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      border-left: 4px solid #667eea;
+    }
+    
+    .info-box ul {
+      margin-left: 20px;
+      color: #555;
+      line-height: 1.8;
+    }
+    
+    label {
+      display: block;
+      margin: 15px 0 5px 0;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 30px;
+      transition: background 0.3s;
+    }
+    
+    button:hover {
+      background: #5568d3;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .error {
+      color: #dc3545;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    
+    .checkbox-group {
+      margin: 20px 0;
+    }
+    
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+    
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🛡️ Welcome to Pure Path</h1>
+    <p class="subtitle">Let's set up your content filter to help you stay focused</p>
+    
+    <div class="info-box">
+      <strong>What Pure Path does:</strong>
+      <ul>
+        <li>Blocks NSFW websites and content</li>
+        <li>Protects you from impulsive decisions</li>
+        <li>Tracks your progress and motivation</li>
+        <li>Requires password to disable protection</li>
+      </ul>
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Set Your Password</div>
+      <p style="color: #666; margin-bottom: 15px;">
+        This password will be required to change settings or disable the extension.
+        Choose something you won't easily remember in a moment of impulse.
+      </p>
+      
+      <label for="password">Password (minimum 6 characters)</label>
+      <input type="password" id="password" placeholder="Enter password">
+      
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" placeholder="Confirm password">
+    </div>
+    
+    <div class="section">
+      <div class="section-title">Your Personal Goal (Optional)</div>
+      <p style="color: #666; margin-bottom: 15px;">
+        Why are you using Pure Path? This will be shown when content is blocked.
+      </p>
+      <textarea id="goal" placeholder="Example: I want to focus on my career, improve my relationships, and become the best version of myself"></textarea>
+    </div>
+    
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" id="consent">
+        <span>I understand that Pure Path will block NSFW content and require a password to disable</span>
+      </label>
+    </div>
+    
+    <div id="errorMessage" class="error"></div>
+    
+    <button id="setupBtn" disabled>Complete Setup</button>
+  </div>
+  
+  <script src="setup.js"></script>
+</body>
+</html>

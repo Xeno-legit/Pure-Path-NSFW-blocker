@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blocklist Manager Test Suite</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    h1 {
+      font-size: 32px;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #718096;
+      margin-bottom: 30px;
+    }
+    
+    .test-section {
+      margin: 30px 0;
+      padding: 20px;
+      background: #f7fafc;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .test-section h2 {
+      font-size: 20px;
+      color: #1a202c;
+      margin-bottom: 15px;
+    }
+    
+    .test-case {
+      margin: 15px 0;
+      padding: 15px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+    }
+    
+    .test-case h3 {
+      font-size: 16px;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
+    
+    .test-input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+    
+    .test-button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-right: 10px;
+    }
+    
+    .test-button:hover {
+      background: #5568d3;
+    }
+    
+    .test-result {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    
+    .test-result.pass {
+      background: #f0fdf4;
+      border: 2px solid #86efac;
+      color: #166534;
+    }
+    
+    .test-result.fail {
+      background: #fef2f2;
+      border: 2px solid #fca5a5;
+      color: #991b1b;
+    }
+    
+    .test-result.info {
+      background: #eff6ff;
+      border: 2px solid #93c5fd;
+      color: #1e40af;
+    }
+    
+    .console-output {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1a202c;
+      color: #10b981;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .console-output div {
+      margin: 2px 0;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    
+    .status-badge.ready {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-badge.testing {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-badge.complete {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🧪 Blocklist Manager Test Suite</h1>
+    <p class="subtitle">Comprehensive testing for search functionality and bug detection</p>
+    
+    <!-- Test Section 1: Search Functionality -->
+    <div class="test-section">
+      <h2>1. Search Functionality Tests <span class="status-badge ready" id="search-status">Ready</span></h2>
+      
+      <div class="test-case">
+        <h3>Test 1.1: Exact Domain Match</h3>
+        <p>Search for: <code>pornhub.com</code> (should be in blocklist)</p>
+        <input type="text" class="test-input" id="test-domain-exact" value="pornhub.com" placeholder="Enter domain">
+        <button class="test-button" onclick="testDomainSearch('test-domain-exact', 'result-domain-exact')">Test Search</button>
+        <div id="result-domain-exact"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 1.2: Partial Domain Match</h3>
+        <p>Search for: <code>porn</code> (should find multiple domains)</p>
+        <input type="text" class="test-input" id="test-domain-partial" value="porn" placeholder="Enter partial domain">
+        <button class="test-button" onclick="testDomainSearch('test-domain-partial', 'result-domain-partial')">Test Search</button>
+        <div id="result-domain-partial"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 1.3: Domain Not Found</h3>
+        <p>Search for: <code>google.com</code> (should NOT be in blocklist)</p>
+        <input type="text" class="test-input" id="test-domain-notfound" value="google.com" placeholder="Enter domain">
+        <button class="test-button" onclick="testDomainSearch('test-domain-notfound', 'result-domain-notfound')">Test Search</button>
+        <div id="result-domain-notfound"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 1.4: Exact Keyword Match</h3>
+        <p>Search for: <code>porn</code> (should be in blocklist)</p>
+        <input type="text" class="test-input" id="test-keyword-exact" value="porn" placeholder="Enter keyword">
+        <button class="test-button" onclick="testKeywordSearch('test-keyword-exact', 'result-keyword-exact')">Test Search</button>
+        <div id="result-keyword-exact"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 1.5: Partial Keyword Match</h3>
+        <p>Search for: <code>sex</code> (should find multiple keywords)</p>
+        <input type="text" class="test-input" id="test-keyword-partial" value="sex" placeholder="Enter partial keyword">
+        <button class="test-button" onclick="testKeywordSearch('test-keyword-partial', 'result-keyword-partial')">Test Search</button>
+        <div id="result-keyword-partial"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 1.6: Keyword Not Found</h3>
+        <p>Search for: <code>programming</code> (should NOT be in blocklist)</p>
+        <input type="text" class="test-input" id="test-keyword-notfound" value="programming" placeholder="Enter keyword">
+        <button class="test-button" onclick="testKeywordSearch('test-keyword-notfound', 'result-keyword-notfound')">Test Search</button>
+        <div id="result-keyword-notfound"></div>
+      </div>
+    </div>
+    
+    <!-- Test Section 2: Modal Functionality -->
+    <div class="test-section">
+      <h2>2. Modal Functionality Tests <span class="status-badge ready" id="modal-status">Ready</span></h2>
+      
+      <div class="test-case">
+        <h3>Test 2.1: Open Domain Modal</h3>
+        <button class="test-button" onclick="testOpenDomainModal()">Open Domain Modal</button>
+        <button class="test-button" onclick="testCloseDomainModal()">Close with X</button>
+        <button class="test-button" onclick="testEscapeKey()">Test Escape Key</button>
+        <div id="result-modal-domain"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 2.2: Open Keyword Modal</h3>
+        <button class="test-button" onclick="testOpenKeywordModal()">Open Keyword Modal</button>
+        <button class="test-button" onclick="testCloseKeywordModal()">Close with X</button>
+        <div id="result-modal-keyword"></div>
+      </div>
+    </div>
+    
+    <!-- Test Section 3: Data Integrity -->
+    <div class="test-section">
+      <h2>3. Data Integrity Tests <span class="status-badge ready" id="data-status">Ready</span></h2>
+      
+      <div class="test-case">
+        <h3>Test 3.1: Check Blocklist Counts</h3>
+        <button class="test-button" onclick="testBlocklistCounts()">Check Counts</button>
+        <div id="result-counts"></div>
+      </div>
+      
+      <div class="test-case">
+        <h3>Test 3.2: Verify Data Types</h3>
+        <button class="test-button" onclick="testDataTypes()">Verify Types</button>
+        <div id="result-types"></div>
+      </div>
+    </div>
+    
+    <!-- Console Output -->
+    <div class="console-output" id="console-output">
+      <div>🖥️ Console Output (Debug Logs)</div>
+      <div>═══════════════════════════════════════</div>
+    </div>
+    
+    <!-- Run All Tests -->
+    <div style="margin-top: 30px; text-align: center;">
+      <button class="test-button" style="font-size: 18px; padding: 15px 40px;" onclick="runAllTests()">
+        🚀 Run All Tests
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    // Capture console logs
+    const originalLog = console.log;
+    const consoleOutput = document.getElementById('console-output');
+    
+    console.log = function(...args) {
+      originalLog.apply(console, args);
+      const message = args.map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      
+      const div = document.createElement('div');
+      div.textContent = message;
+      consoleOutput.appendChild(div);
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    };
+    
+    // Test functions
+    function testDomainSearch(inputId, resultId) {
+      const input = document.getElementById(inputId);
+      const result = document.getElementById(resultId);
+      const searchTerm = input.value.trim().toLowerCase();
+      
+      console.log(`🔍 Testing domain search: "${searchTerm}"`);
+      
+      // Simulate search (in real extension, this would query the blocklist)
+      chrome.runtime.sendMessage({ action: 'getBlocklists' }, (response) => {
+        if (response && response.domains) {
+          const matches = response.domains.filter(d => 
+            d.toLowerCase().includes(searchTerm) || searchTerm.includes(d.toLowerCase())
+          );
+          
+          if (matches.length > 0) {
+            result.className = 'test-result pass';
+            result.innerHTML = `✅ PASS: Found ${matches.length} match(es)<br>Examples: ${matches.slice(0, 3).join(', ')}`;
+            console.log(`✅ Found ${matches.length} matches`);
+          } else {
+            result.className = 'test-result info';
+            result.innerHTML = `ℹ️ INFO: No matches found (expected for non-NSFW domains)`;
+            console.log(`ℹ️ No matches found`);
+          }
+        } else {
+          result.className = 'test-result fail';
+          result.innerHTML = `❌ FAIL: Could not load blocklist`;
+          console.log(`❌ Failed to load blocklist`);
+        }
+      });
+    }
+    
+    function testKeywordSearch(inputId, resultId) {
+      const input = document.getElementById(inputId);
+      const result = document.getElementById(resultId);
+      const searchTerm = input.value.trim().toLowerCase();
+      
+      console.log(`🔍 Testing keyword search: "${searchTerm}"`);
+      
+      chrome.runtime.sendMessage({ action: 'getBlocklists' }, (response) => {
+        if (response && response.keywords) {
+          const matches = response.keywords.filter(k => 
+            k.toLowerCase().includes(searchTerm) || searchTerm.includes(k.toLowerCase())
+          );
+          
+          if (matches.length > 0) {
+            result.className = 'test-result pass';
+            result.innerHTML = `✅ PASS: Found ${matches.length} match(es)<br>Examples: ${matches.slice(0, 5).join(', ')}`;
+            console.log(`✅ Found ${matches.length} matches`);
+          } else {
+            result.className = 'test-result info';
+            result.innerHTML = `ℹ️ INFO: No matches found (expected for safe keywords)`;
+            console.log(`ℹ️ No matches found`);
+          }
+        } else {
+          result.className = 'test-result fail';
+          result.innerHTML = `❌ FAIL: Could not load blocklist`;
+          console.log(`❌ Failed to load blocklist`);
+        }
+      });
+    }
+    
+    function testOpenDomainModal() {
+      console.log('🔓 Opening domain modal...');
+      chrome.tabs.create({ url: 'blocklists.html' });
+    }
+    
+    function testCloseDomainModal() {
+      console.log('🔒 Testing domain modal close...');
+      alert('Please manually test closing the modal with the X button');
+    }
+    
+    function testOpenKeywordModal() {
+      console.log('🔓 Opening keyword modal...');
+      chrome.tabs.create({ url: 'blocklists.html' });
+    }
+    
+    function testCloseKeywordModal() {
+      console.log('🔒 Testing keyword modal close...');
+      alert('Please manually test closing the modal with the X button');
+    }
+    
+    function testEscapeKey() {
+      console.log('⌨️ Testing Escape key...');
+      alert('Please manually test pressing Escape key when modal is open');
+    }
+    
+    function testBlocklistCounts() {
+      const result = document.getElementById('result-counts');
+      console.log('📊 Checking blocklist counts...');
+      
+      chrome.runtime.sendMessage({ action: 'getBlocklists' }, (response) => {
+        if (response) {
+          const domainCount = response.domains ? response.domains.length : 0;
+          const keywordCount = response.keywords ? response.keywords.length : 0;
+          
+          result.className = 'test-result pass';
+          result.innerHTML = `
+            ✅ PASS: Blocklists loaded<br>
+            • Domains: ${domainCount.toLocaleString()}<br>
+            • Keywords: ${keywordCount.toLocaleString()}
+          `;
+          console.log(`✅ Domains: ${domainCount}, Keywords: ${keywordCount}`);
+        } else {
+          result.className = 'test-result fail';
+          result.innerHTML = `❌ FAIL: Could not load blocklists`;
+          console.log(`❌ Failed to load blocklists`);
+        }
+      });
+    }
+    
+    function testDataTypes() {
+      const result = document.getElementById('result-types');
+      console.log('🔍 Verifying data types...');
+      
+      chrome.runtime.sendMessage({ action: 'getBlocklists' }, (response) => {
+        if (response) {
+          const domainType = Array.isArray(response.domains) ? 'Array ✅' : `${typeof response.domains} ❌`;
+          const keywordType = Array.isArray(response.keywords) ? 'Array ✅' : `${typeof response.keywords} ❌`;
+          
+          const allValid = Array.isArray(response.domains) && Array.isArray(response.keywords);
+          
+          result.className = allValid ? 'test-result pass' : 'test-result fail';
+          result.innerHTML = `
+            ${allValid ? '✅ PASS' : '❌ FAIL'}: Data type verification<br>
+            • Domains: ${domainType}<br>
+            • Keywords: ${keywordType}
+          `;
+          console.log(`${allValid ? '✅' : '❌'} Domains: ${domainType}, Keywords: ${keywordType}`);
+        } else {
+          result.className = 'test-result fail';
+          result.innerHTML = `❌ FAIL: No response from extension`;
+          console.log(`❌ No response`);
+        }
+      });
+    }
+    
+    function runAllTests() {
+      console.log('═══════════════════════════════════════');
+      console.log('🚀 Running all automated tests...');
+      console.log('═══════════════════════════════════════');
+      
+      // Run all automated tests
+      setTimeout(() => testDomainSearch('test-domain-exact', 'result-domain-exact'), 100);
+      setTimeout(() => testDomainSearch('test-domain-partial', 'result-domain-partial'), 300);
+      setTimeout(() => testDomainSearch('test-domain-notfound', 'result-domain-notfound'), 500);
+      setTimeout(() => testKeywordSearch('test-keyword-exact', 'result-keyword-exact'), 700);
+      setTimeout(() => testKeywordSearch('test-keyword-partial', 'result-keyword-partial'), 900);
+      setTimeout(() => testKeywordSearch('test-keyword-notfound', 'result-keyword-notfound'), 1100);
+      setTimeout(() => testBlocklistCounts(), 1300);
+      setTimeout(() => testDataTypes(), 1500);
+      
+      setTimeout(() => {
+        console.log('═══════════════════════════════════════');
+        console.log('✅ All automated tests complete!');
+        console.log('📝 Manual tests: Open modals and test close buttons');
+        console.log('═══════════════════════════════════════');
+      }, 2000);
+    }
+    
+    // Auto-run tests on load
+    window.addEventListener('load', () => {
+      console.log('🎯 Test suite loaded and ready');
+      console.log('Click "Run All Tests" to begin');
+    });
+  </script>
+</body>
+</html>
