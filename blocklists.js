@@ -5,6 +5,7 @@
 let domains = [];
 let keywords = [];
 let stats = { totalBlocks: 0 };
+let isDataLoaded = false; // Track if data is loaded
 
 // Debug mode flag
 const DEBUG = true;
@@ -22,39 +23,127 @@ function debugLog(category, message, data = null) {
   }
 }
 
+// ============================================================================
+// CACHE MANAGEMENT - Persist counts across page refreshes
+// ============================================================================
+
+// Save counts to localStorage
+function saveCounts() {
+  try {
+    localStorage.setItem('purepath_domain_count', domains.length);
+    localStorage.setItem('purepath_keyword_count', keywords.length);
+    localStorage.setItem('purepath_threats_count', stats.totalBlocks || 0);
+    debugLog('CACHE', '💾 Saved counts to localStorage');
+  } catch (error) {
+    debugLog('CACHE', '❌ Failed to save counts:', error);
+  }
+}
+
+// Load counts from localStorage
+function loadCachedCounts() {
+  try {
+    const cachedDomainCount = localStorage.getItem('purepath_domain_count');
+    const cachedKeywordCount = localStorage.getItem('purepath_keyword_count');
+    const cachedThreatsCount = localStorage.getItem('purepath_threats_count');
+    
+    if (cachedDomainCount) {
+      document.getElementById('domainCount').textContent = parseInt(cachedDomainCount).toLocaleString();
+      document.getElementById('domainStatus').textContent = `● ${parseInt(cachedDomainCount).toLocaleString()} ACTIVE`;
+    }
+    
+    if (cachedKeywordCount) {
+      document.getElementById('keywordCount').textContent = parseInt(cachedKeywordCount).toLocaleString();
+      document.getElementById('keywordStatus').textContent = `● ${parseInt(cachedKeywordCount).toLocaleString()} ACTIVE`;
+    }
+    
+    if (cachedThreatsCount) {
+      const threatsCount = parseInt(cachedThreatsCount);
+      let formatted;
+      if (threatsCount >= 1000000) {
+        formatted = (threatsCount / 1000000).toFixed(1) + 'M';
+      } else if (threatsCount >= 1000) {
+        formatted = (threatsCount / 1000).toFixed(1) + 'k';
+      } else {
+        formatted = threatsCount.toString();
+      }
+      document.getElementById('threatsCount').textContent = formatted;
+    }
+    
+    debugLog('CACHE', '✅ Loaded cached counts from localStorage');
+  } catch (error) {
+    debugLog('CACHE', '❌ Failed to load cached counts:', error);
+  }
+}
+
+// Load cached counts immediately on page load
+loadCachedCounts();
+
 // Load blocklists and stats with error handling
 debugLog('INIT', '🚀 Blocklist Manager initializing...');
 
+// Load blocklists from JSON files directly
+async function loadBlocklistsFromFiles() {
+  try {
+    debugLog('LOAD', '📂 Loading blocklists from JSON files...');
+    const [domainsResponse, keywordsResponse] = await Promise.all([
+      fetch('blocklists/domains.json'),
+      fetch('blocklists/keywords.json')
+    ]);
+    
+    const domainsData = await domainsResponse.json();
+    const keywordsData = await keywordsResponse.json();
+    
+    domains = domainsData.domains || [];
+    keywords = keywordsData.keywords || [];
+    isDataLoaded = true;
+    
+    debugLog('LOAD', `✅ Loaded ${domains.length} domains and ${keywords.length} keywords from files`);
+    
+    // Update counts and save to cache
+    updateCounts();
+    saveCounts();
+    debugLog('UI', '✅ UI updated with counts from files');
+    
+    return true;
+  } catch (error) {
+    debugLog('ERROR', '❌ Failed to load from files:', error);
+    return false;
+  }
+}
+
+// Initialize by loading from files first (most reliable)
+loadBlocklistsFromFiles().then(success => {
+  if (success) {
+    debugLog('INIT', '✅ Initialization complete from files');
+  } else {
+    debugLog('ERROR', '❌ Failed to initialize from files');
+    showSystemError('Failed to load blocklists. Please reload the page.');
+  }
+});
+
+// Also try to load from background script (for sync purposes)
 chrome.runtime.sendMessage({ action: 'getBlocklists' }, (response) => {
   if (chrome.runtime.lastError) {
-    debugLog('ERROR', '❌ Failed to load blocklists:', chrome.runtime.lastError);
-    console.error('Error loading blocklists:', chrome.runtime.lastError);
-    showSystemError('Failed to load blocklists. Please reload the page.');
+    debugLog('WARN', '⚠️ Background script not available:', chrome.runtime.lastError);
     return;
   }
   
-  if (response) {
-    domains = response.domains || [];
-    keywords = response.keywords || [];
-    
-    debugLog('LOAD', `✅ Loaded ${domains.length} domains and ${keywords.length} keywords`);
-    
-    // Validate data
-    if (!Array.isArray(domains)) {
-      debugLog('ERROR', '❌ Domains is not an array:', typeof domains);
-      domains = [];
+  if (response && response.domains && response.keywords) {
+    // Only update if we got valid data from background
+    if (response.domains.length > 0 && response.keywords.length > 0) {
+      domains = response.domains;
+      keywords = response.keywords;
+      isDataLoaded = true;
+      
+      debugLog('LOAD', `✅ Updated from background: ${domains.length} domains and ${keywords.length} keywords`);
+      
+      // Update counts and save to cache
+      updateCounts();
+      saveCounts();
+      debugLog('UI', '✅ UI updated with counts from background');
+    } else {
+      debugLog('WARN', '⚠️ Background returned empty arrays, keeping file data');
     }
-    if (!Array.isArray(keywords)) {
-      debugLog('ERROR', '❌ Keywords is not an array:', typeof keywords);
-      keywords = [];
-    }
-    
-    // Update counts
-    updateCounts();
-    debugLog('UI', '✅ UI updated with counts');
-  } else {
-    debugLog('ERROR', '❌ No response from background script');
-    showSystemError('No response from extension. Please reload.');
   }
 });
 
@@ -69,6 +158,7 @@ chrome.runtime.sendMessage({ action: 'getStats' }, (response) => {
     stats = response.stats;
     debugLog('STATS', '✅ Stats loaded:', stats);
     updateThreatsCount();
+    saveCounts();
   } else {
     debugLog('WARN', '⚠️ No stats available');
   }
@@ -111,6 +201,9 @@ function updateCounts() {
   document.getElementById('keywordCount').textContent = keywords.length.toLocaleString();
   document.getElementById('keywordStatus').textContent = `● ${keywords.length.toLocaleString()} ACTIVE`;
   document.getElementById('keywordSearch').placeholder = `Search ${keywords.length.toLocaleString()} keywords...`;
+  
+  // Save to cache
+  saveCounts();
 }
 
 // Update threats count
@@ -126,6 +219,9 @@ function updateThreatsCount() {
     formatted = threatsCount.toString();
   }
   document.getElementById('threatsCount').textContent = formatted;
+  
+  // Save to cache
+  saveCounts();
 }
 
 // ============================================================================
@@ -215,7 +311,7 @@ domainSearch.addEventListener('input', (e) => {
           <div class="result-detail"><strong>${cleanSearch}</strong> is not in the blocklist</div>
           <div class="result-detail" style="margin-top: 4px; font-size: 12px;">
             <button onclick="document.getElementById('addDomainBtn').click(); document.getElementById('domainInput').value='${cleanSearch}';" 
-                    style="background: #667eea; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 4px;">
+                    style="background: #4dabf7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 4px;">
               + Add to blocklist
             </button>
           </div>
@@ -317,7 +413,7 @@ keywordSearch.addEventListener('input', (e) => {
           <div class="result-detail"><strong>${searchTerm}</strong> is not in the blocklist</div>
           <div class="result-detail" style="margin-top: 4px; font-size: 12px;">
             <button onclick="document.getElementById('addKeywordBtn').click(); document.getElementById('keywordInput').value='${searchTerm}';" 
-                    style="background: #a855f7; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 4px;">
+                    style="background: #7b1fa2; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-top: 4px;">
               + Add to blocklist
             </button>
           </div>

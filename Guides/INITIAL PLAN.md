@@ -229,3 +229,13 @@
 - Motivational dashboard and statistics
 
 - Build this as a tool that genuinely helps people improve their lives, not just a blocker. Focus on encouragement and positive reinforcement throughout the user experience.
+
+
+
+Phase 1 (MVP): Extension with domain + keyword blocking + basic password protection 
+Phase 2: Desktop app that connects to the browsers + friction system with 48-hour waiting period
+Phase 3: Image detection with NSFW.js
+Phase 4: Motivational dashboard + statistics
+Phase 5: Mobile support
+Phase 6: More languages support
+Phase 7: Full launch.
