@@ -13,7 +13,7 @@
     
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: #f8f9fa;
+      background: #e9ecef;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -24,10 +24,15 @@
       background: white;
       border-bottom: 1px solid #e9ecef;
       padding: 16px 32px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    
+    .navbar-content {
+      max-width: 1200px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     .navbar-brand {
@@ -727,20 +732,22 @@
 <body>
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="navbar-brand">
-      <div class="navbar-logo">
-        <img src="icons/icon48.png" alt="Pure Path">
+    <div class="navbar-content">
+      <div class="navbar-brand">
+        <div class="navbar-logo">
+          <img src="icons/icon48.png" alt="Pure Path">
+        </div>
+        <div class="navbar-title">Pure Path</div>
       </div>
-      <div class="navbar-title">Pure Path</div>
-    </div>
-    
-    <div class="navbar-status">
-      <div class="navbar-status-dot"></div>
-      <span class="navbar-status-text">PROTECTION ACTIVE</span>
-    </div>
-    
-    <div class="navbar-nav">
-      <a href="popup.html" class="nav-button">Dashboard</a>
+      
+      <div class="navbar-status">
+        <div class="navbar-status-dot"></div>
+        <span class="navbar-status-text">PROTECTION ACTIVE</span>
+      </div>
+      
+      <div class="navbar-nav">
+        <a href="popup.html" class="nav-button">Dashboard</a>
+      </div>
     </div>
   </nav>
   
