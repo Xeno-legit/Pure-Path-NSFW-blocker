@@ -114,4 +114,75 @@
   } else {
     checkPageContent();
   }
+  
+  // ============================================================================
+  // SPA URL MONITORING (for sites like Reddit that use client-side routing)
+  // ============================================================================
+  
+  let lastUrl = window.location.href;
+  
+  // Function to check URL with background script
+  async function checkCurrentUrl() {
+    const currentUrl = window.location.href;
+    
+    // Skip if URL hasn't changed
+    if (currentUrl === lastUrl) {
+      return;
+    }
+    
+    console.log('🔍 Pure Path: URL changed (SPA navigation):', currentUrl);
+    lastUrl = currentUrl;
+    
+    // Send message to background script to check URL
+    try {
+      const response = await chrome.runtime.sendMessage({
+        action: 'checkUrl',
+        url: currentUrl
+      });
+      
+      if (response && response.blocked) {
+        console.log('🚫 Pure Path: URL blocked by background script');
+        const blockedUrl = chrome.runtime.getURL('blocked.html') + 
+          `?reason=${response.reason}&match=${encodeURIComponent(response.match)}&url=${encodeURIComponent(currentUrl)}`;
+        window.location.replace(blockedUrl);
+      }
+    } catch (error) {
+      console.error('❌ Pure Path: Error checking URL:', error);
+    }
+  }
+  
+  // Monitor URL changes using multiple methods
+  
+  // Method 1: Listen for popstate events (back/forward navigation)
+  window.addEventListener('popstate', () => {
+    console.log('🔄 Pure Path: popstate event detected');
+    checkCurrentUrl();
+  });
+  
+  // Method 2: Listen for pushState and replaceState (SPA navigation)
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+  
+  history.pushState = function(...args) {
+    originalPushState.apply(this, args);
+    console.log('🔄 Pure Path: pushState detected');
+    checkCurrentUrl();
+  };
+  
+  history.replaceState = function(...args) {
+    originalReplaceState.apply(this, args);
+    console.log('🔄 Pure Path: replaceState detected');
+    checkCurrentUrl();
+  };
+  
+  // Method 3: Periodic URL check as fallback (every 500ms)
+  setInterval(() => {
+    if (window.location.href !== lastUrl) {
+      console.log('🔄 Pure Path: URL change detected via polling');
+      checkCurrentUrl();
+    }
+  }, 500);
+  
+  // Check URL immediately on script load
+  checkCurrentUrl();
 })();
