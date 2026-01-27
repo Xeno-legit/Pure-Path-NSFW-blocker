@@ -4,9 +4,11 @@ First off, thank you for considering contributing to Pure Path! It's people like
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our commitment to creating a welcoming and inclusive environment. By participating, you are expected to uphold this standard.
+This project and everyone participating in it is governed by our commitment to creating a welcoming and inclusive environment. By participating, you are expected to uphold this standard. (GPL V3 license)
 
 ## How Can I Contribute?
+
+Email me at: **abdelhamidalielsebaie@gmail.com**
 
 ### Reporting Bugs
 
@@ -39,73 +41,6 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 * Include thoughtfully-worded, well-structured tests
 * Document new code
 * End all files with a newline
-
-## Development Process
-
-### Setup Development Environment
-
-1. Fork the repo
-2. Clone your fork
-   ```bash
-   git clone https://github.com/YOUR-USERNAME/Pure-Path-NSFW-blocker.git
-   cd Pure-Path-NSFW-blocker
-   ```
-3. Load extension in browser (see README.md)
-
-### Making Changes
-
-1. Create a branch
-   ```bash
-   git checkout -b feature/my-new-feature
-   ```
-
-2. Make your changes
-   - Follow existing code style
-   - Add tests if applicable
-   - Update documentation
-
-3. Test your changes
-   - Run test suite (test-blocklists.html)
-   - Test manually in browser
-   - Check console for errors
-
-4. Commit your changes
-   ```bash
-   git commit -m "Add some feature"
-   ```
-
-5. Push to your fork
-   ```bash
-   git push origin feature/my-new-feature
-   ```
-
-6. Open a Pull Request
-
-### Coding Standards
-
-#### JavaScript Style
-
-* Use ES6+ features
-* Use `const` and `let`, not `var`
-* Use arrow functions where appropriate
-* Use template literals for string interpolation
-* Add comments for complex logic
-* Keep functions small and focused
-
-#### Example:
-```javascript
-// Good
-const getUserData = async (userId) => {
-  const response = await fetch(`/api/users/${userId}`);
-  return response.json();
-};
-
-// Bad
-var getUserData = function(userId) {
-  var response = fetch('/api/users/' + userId);
-  return response.json();
-}
-```
 
 #### HTML/CSS Style
 
@@ -195,7 +130,6 @@ pure-path/
 
 ## Performance Considerations
 
-* Keep blocklists efficient (use Sets for lookups)
 * Minimize DOM operations
 * Use debouncing for search
 * Avoid blocking the main thread
@@ -215,9 +149,6 @@ Feel free to open an issue with your question or reach out to the maintainers.
 
 ## Recognition
 
-Contributors will be recognized in:
-* README.md acknowledgments
-* Release notes
-* Project documentation
+Contributors will be recognized Here.
 
-Thank you for contributing to Pure Path! 🛡️
+Thank you for contributing to Pure Path! ❤️
